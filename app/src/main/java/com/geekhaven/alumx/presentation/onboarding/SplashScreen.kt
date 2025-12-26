@@ -25,6 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.material3.Surface
+
 @Composable
 fun SplashScreen(onAnimationFinished: () -> Unit) {
     val alpha = remember { Animatable(0f) }
@@ -78,6 +81,16 @@ fun SplashScreen(onAnimationFinished: () -> Unit) {
                 color = Color.Gray,
                 letterSpacing = 1.sp
             )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SplashScreenPreview() {
+    MaterialTheme {
+        Surface {
+            SplashScreen(onAnimationFinished = {})
         }
     }
 }
