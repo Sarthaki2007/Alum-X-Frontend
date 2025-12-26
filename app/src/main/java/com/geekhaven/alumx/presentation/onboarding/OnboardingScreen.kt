@@ -1,12 +1,10 @@
 package com.geekhaven.alumx.presentation.onboarding
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,15 +18,14 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -36,17 +33,54 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.geekhaven.alumx.R
 
-// Custom Colors from verified design
+// --- Design Tokens ---
 val BackgroundDark = Color(0xFF0F1116)
 val PrimaryBlue = Color(0xFF2563EB)
 val TextGrey = Color(0xFF9CA3AF)
 val BorderGrey = Color(0xFF374151)
 
+// --- Data Model ---
+data class OnboardingPageData(
+    val title: AnnotatedString,
+    val description: String,
+    val imageColor: Color // Simulating different images
+)
+
 @Composable
 fun OnboardingScreen(onGetStarted: () -> Unit) {
-    val pagerState = rememberPagerState(pageCount = { 3 })
+    // defined items dynamically
+    val pages = remember {
+        listOf(
+            OnboardingPageData(
+                title = buildAnnotatedString {
+                    append("Connect. ")
+                    withStyle(style = SpanStyle(color = PrimaryBlue)) { append("Mentor.") }
+                    append(" Grow.")
+                },
+                description = "Join the ultimate alumni network. Access mentorship, blogs, and career tools all in one place.",
+                imageColor = Color(0xFFE0E0E0)
+            ),
+            OnboardingPageData(
+                title = buildAnnotatedString {
+                    append("Network with ")
+                    withStyle(style = SpanStyle(color = PrimaryBlue)) { append("Alumni.") }
+                },
+                description = "Find mentors from your dream companies and get guidance on your career path.",
+                imageColor = Color(0xFFD1D5DB)
+            ),
+            OnboardingPageData(
+                title = buildAnnotatedString {
+                    append("Unlock ")
+                    withStyle(style = SpanStyle(color = PrimaryBlue)) { append("Careers.") }
+                },
+                description = "Get exclusive job referrals and stay updated with the latest industry trends.",
+                imageColor = Color(0xFF9CA3AF)
+            )
+        )
+    }
+
+    val pagerState = rememberPagerState(pageCount = { pages.size })
 
     Column(
         modifier = Modifier
@@ -61,7 +95,6 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            // Placeholder for logo icon (Blue Box)
             Box(
                 modifier = Modifier
                     .size(32.dp)
@@ -69,7 +102,6 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
                     .background(PrimaryBlue),
                 contentAlignment = Alignment.Center
             ) {
-                 // Simple icon shape
                  Box(modifier = Modifier.size(16.dp).background(Color.White, RoundedCornerShape(2.dp)))
             }
             Spacer(modifier = Modifier.width(8.dp))
@@ -84,23 +116,6 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
         
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- Image Container ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(320.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(Color(0xFFE0E0E0)) // Fallback/Placeholder color
-        ) {
-             // In a real app, use painterResource(id = R.drawable.onboarding_img)
-             // Simulating the grayscale team image look with a placeholder
-             Box(
-                 modifier = Modifier
-                     .fillMaxSize()
-                     .background(Color.DarkGray)
-             )
-        }
-
         Spacer(modifier = Modifier.height(24.dp))
 
         // --- Pager Indicators ---
@@ -108,7 +123,7 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            repeat(3) { index ->
+            repeat(pages.size) { index ->
                 val isSelected = pagerState.currentPage == index
                 val width = if (isSelected) 32.dp else 6.dp
                 val color = if (isSelected) PrimaryBlue else BorderGrey
@@ -120,46 +135,42 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
                         .clip(RoundedCornerShape(3.dp))
                         .background(color)
                 )
-                if (index < 2) Spacer(modifier = Modifier.width(8.dp))
+                if (index < pages.size - 1) Spacer(modifier = Modifier.width(8.dp))
             }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // --- Pager Content (Headline & Subtext) ---
+        // --- Pager Content ---
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.weight(1f)
-        ) { page ->
+        ) { pageIndex ->
+             val pageData = pages[pageIndex]
+             
              Column(
                  horizontalAlignment = Alignment.CenterHorizontally,
-                 verticalArrangement = Arrangement.Top
+                 verticalArrangement = Arrangement.Top,
+                 modifier = Modifier.fillMaxSize()
              ) {
-                // Headlines based on page
-                val headlineText = when(page) {
-                    0 -> buildAnnotatedString {
-                        append("Connect. ")
-                        withStyle(style = SpanStyle(color = PrimaryBlue)) { append("Mentor.") }
-                        append(" Grow.")
-                    }
-                    1 -> buildAnnotatedString {
-                         append("Network with ")
-                         withStyle(style = SpanStyle(color = PrimaryBlue)) { append("Alumni.") }
-                    }
-                    else -> buildAnnotatedString {
-                        append("Unlock ")
-                        withStyle(style = SpanStyle(color = PrimaryBlue)) { append("Careers.") }
-                    }
-                }
-                
-                val subText = when(page) {
-                    0 -> "Join the ultimate alumni network. Access mentorship, blogs, and career tools all in one place."
-                    1 -> "Find mentors from your dream companies and get guidance on your career path."
-                    else -> "Get exclusive job referrals and stay updated with the latest industry trends."
+                // Image Container (Dynamic)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(320.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(pageData.imageColor) 
+                ) {
+                     Box(
+                         modifier = Modifier
+                             .fillMaxSize()
+                             .background(Color.Black.copy(alpha=0.1f))
+                     )
                 }
 
+                Spacer(modifier = Modifier.height(24.dp))
                  Text(
-                     text = headlineText,
+                     text = pageData.title,
                      color = Color.White,
                      fontSize = 28.sp,
                      fontWeight = FontWeight.Bold,
@@ -170,7 +181,7 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
                  Spacer(modifier = Modifier.height(12.dp))
                  
                  Text(
-                     text = subText,
+                     text = pageData.description,
                      color = TextGrey,
                      fontSize = 15.sp,
                      textAlign = TextAlign.Center,
@@ -183,7 +194,6 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Primary Button "Get Started"
             Button(
                 onClick = onGetStarted,
                 modifier = Modifier
@@ -204,9 +214,8 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
             
             Spacer(modifier = Modifier.height(12.dp))
             
-            // Outline Button "Log In"
             Button(
-                onClick = onGetStarted, // Routes to same login for now
+                onClick = onGetStarted,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
@@ -227,7 +236,6 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
             
              Spacer(modifier = Modifier.height(16.dp))
              
-             // Footer
              Text(
                  text = "By continuing, you accept our Terms of Service",
                  color = Color(0xFF6B7280),
