@@ -27,3 +27,4 @@ Thanks to all the amazing people who have contributed to **AlumX's Frontend Repo
 - Sayed Al Amaan Zaidi(@amaan1114)
 - Kushagra Sahu(@KushagraSahu-01)
 - Himansh Arora(@Humanshere)
+- Ishan Raj Singh (@ishanrajsingh)
